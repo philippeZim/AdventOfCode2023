@@ -69,125 +69,71 @@ print(res)
 
 # Part 2
 
-def num_start_left(i, j):
-	numStr = ""
-	for k in range(j, len(lines[0])):
-		if lines[i][k].isdigit():
-			numStr += lines[i][k]
-		else:
-			break
-	return int(numStr)
+lines = []
 
-def num_start_right(i, j):
-	numStr = ""
-	for k in range(j, -1, -1):
-		if lines[i][k].isdigit():
-			numStr = lines[i][k] + numStr
-		else:
-			break
-	return int(numStr)
+with open("input.txt", "r") as f:
+    lines = f.readlines()
 
-def findLeft(i, j):
-	k = j
-	while(True):
-		if k == 0:
-			return 0
-		if lines[i][k].isdigit():
-			k -= 1
-		else:
-			return k + 1
-
-def helper2(i, j):
-	
-	temp = [[0] * 3 for _ in range(3)]
-	
-	for k in range(i - 1, i + 2):
-		for l in range(j - 1, j + 2):
-			if k < 0 or l < 0:
-				continue
-			try:
-				if lines[k][l].isdigit():
-					temp[k - (i - 1)][l - (j - 1)] = 1
-			except IndexError:
-				pass
-	
-	numbers = 0
-	if temp[0] == [1, 0, 0]:
-		numbers += 1
-	elif temp[0] == [0, 0, 1]:
-		numbers += 1
-	elif temp[0] == [1, 0, 1]:
-		numbers += 2
-	elif temp[0][1] == 1:
-		numbers += 1
-	
-	if temp[1][0] == 1:
-		numbers += 1
-	if temp[1][2] == 1:
-		numbers += 1
-	
-	if temp[2] == [1, 0, 0]:
-		numbers += 1
-	elif temp[2] == [0, 0, 1]:
-		numbers += 1
-	elif temp[2] == [1, 0, 1]:
-		numbers += 2
-	elif temp[2][1] == 1:
-		numbers += 1
-	
-	if not numbers == 2:
-		return -1
-	
-	prod = 1
-	
-	if temp[0] == [1, 0, 0]:
-		prod *= num_start_right(i - 1, j - 1)
-	elif temp[0] == [0, 1, 0]:
-		prod *= int(lines[i - 1][j])
-	elif temp[0] == [0, 0, 1]:
-		prod *= num_start_left(i - 1, j + 1)
-	elif temp[0] == [1, 0, 1]:
-		prod *= num_start_right(i - 1, j - 1)
-		prod *= num_start_left(i - 1, j + 1)
-	elif temp[0] == [0, 1, 1]:
-		prod *= num_start_left(i - 1, j)
-	elif temp[0] == [1, 1, 0]:
-		prod *= num_start_right(i - 1, j)
-	elif temp[0] == [1, 1, 1]:
-		prod *= num_start_left(i - 1, findLeft(i - 1, j - 1))
-	
-	
-	if temp[1][0] == 1:
-		prod *= num_start_right(i, j - 1)
-	if temp[1][2] == 1:
-		prod *= num_start_right(i, j + 1)
-	
-	if temp[2] == [1, 0, 0]:
-		prod *= num_start_right(i + 1, j - 1)
-	elif temp[2] == [0, 1, 0]:
-		prod *= int(lines[i + 1][j])
-	elif temp[2] == [0, 0, 1]:
-		prod *= num_start_left(i + 1, j + 1)
-	elif temp[2] == [1, 0, 1]:
-		prod *= num_start_right(i + 1, j - 1)
-		prod *= num_start_left(i + 1, j + 1)
-	elif temp[2] == [0, 1, 1]:
-		prod *= num_start_left(i + 1, j)
-	elif temp[2] == [1, 1, 0]:
-		prod *= num_start_right(i + 1, j)
-	elif temp[2] == [1, 1, 1]:
-		prod *= num_start_left(i + 1, findLeft(i + 1, j - 1))
-	
-	return prod
-
-
-sum2 = 0
+temp = []
 for i in range(len(lines)):
-	for j in range(len(lines[0])):
-		if lines[i][j] == "*":
-			cur = helper2(i, j)
-			if not cur == -1:
-				sum2 += cur
-print(sum2)
-	
-			
+    if i == len(lines) - 1:
+        temp.append(lines[i])
+    else:
+        temp.append(lines[i][:-1])
+lines = temp
+
+
+def nums_positions(lines):
+    cur_num = ""
+    nums = []
+    last = [0, 0]
+    for i in range(len(lines)):
+        for j in range(len(lines[0])):
+            if j == 0 and cur_num:
+                nums.append([int(cur_num), last[0], last[1]])
+                cur_num = ""
+            elif lines[i][j].isdigit():
+                cur_num += lines[i][j]
+            else:
+                if cur_num:
+                    nums.append([int(cur_num), last[0], last[1]])
+                    cur_num = ""
+            last = [i, j]
+    return nums
+
+
+def digits(num):
+    return len(str(abs(num)))
+
+
+def mapNums(lines, num_pos):
+    nums = [[[] for _ in range(len(lines[0]))] for _ in range(len(lines))]
+    for x in num_pos:
+        for i in range(x[1] - 1, x[1] + 2):
+            for j in range(x[2] - 1 - (digits(x[0]) - 1), x[2] + 2):
+                if i < 0 or j < 0:
+                    continue
+                try:
+                    nums[i][j].append(x[0])
+                except IndexError:
+                    pass
+    return nums
+
+
+def resultCalc(lines):
+    pos = nums_positions(lines)
+    num_map = mapNums(lines, pos)
+    res = 0
+    for i in range(len(lines)):
+        for j in range(len(lines[0])):
+            if lines[i][j] == "*":
+                gear = 1
+                if len(num_map[i][j]) == 2:
+                    for x in num_map[i][j]:
+                        gear *= x
+                    res += gear
+    return res
+
+
+test = resultCalc(lines)
+print(test)
