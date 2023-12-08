@@ -1,70 +1,72 @@
 lines = []
 
 with open("input.txt", "r") as f:
-	lines = f.readlines()
+    lines = f.readlines()
 
 temp = []
 for i in range(len(lines)):
-	if not i == len(lines) - 1:
-		temp.append(lines[i][:-1])
-	else:
-		temp.append(lines[i])
-	
+    if not i == len(lines) - 1:
+        temp.append(lines[i][:-1])
+    else:
+        temp.append(lines[i])
+
 lines = temp
 
 grid = [[0] * len(lines[0]) for _ in range(len(lines))]
 
 def helper(i, j, grid_len, first_el_len):
-	res = [
-	[i - 1, j - 1],
-	[i - 1, j],
-	[i - 1, j + 1],
-	[i, j - 1],
-	[i, j + 1],
-	[i + 1, j - 1],
-	[i + 1, j],
-	[i + 1, j + 1]
-	]
-	temp = []
-	for x in res:
-		if x[0] < 0 or x[1] < 0:
-			continue
-		if x[0] > grid_len - 1 or x[1] > first_el_len - 1:
-			continue
-		temp.append(x)
-	return temp
+    res = [
+        [i - 1, j - 1],
+        [i - 1, j],
+        [i - 1, j + 1],
+        [i, j - 1],
+        [i, j + 1],
+        [i + 1, j - 1],
+        [i + 1, j],
+        [i + 1, j + 1]
+    ]
+    temp = []
+    for x in res:
+        if x[0] < 0 or x[1] < 0:
+            continue
+        if x[0] > grid_len - 1 or x[1] > first_el_len - 1:
+            continue
+        temp.append(x)
+    return temp
+
 
 for i in range(len(lines)):
-	for j in range(len(lines[0])):
-		if not lines[i][j].isdigit() and not lines[i][j] == ".":
-			cur = helper(i, j, len(grid), len(grid[0]))
-			for x in cur:
-				grid[x[0]][x[1]] = 1
+    for j in range(len(lines[0])):
+        if not lines[i][j].isdigit() and not lines[i][j] == ".":
+            cur = helper(i, j, len(grid), len(grid[0]))
+            for x in cur:
+                grid[x[0]][x[1]] = 1
+
 
 def arrToNum(arr):
-	res = 0
-	offset = 1
-	for i in range(len(arr) - 1, -1, -1):
-		res += arr[i] * offset
-		offset *= 10
-	return res
+    res = 0
+    offset = 1
+    for i in range(len(arr) - 1, -1, -1):
+        res += arr[i] * offset
+        offset *= 10
+    return res
 
 
 cur_num = []
 toadd = False
 res = 0
 for i in range(len(lines)):
-	for j in range(len(lines[0])):
-		if lines[i][j].isdigit():
-			cur_num.append(int(lines[i][j]))
-			if grid[i][j] == 1:
-				toadd = True
-		else:
-			if cur_num and toadd:
-				num = arrToNum(cur_num)
-				res += num
-			cur_num = []
-			toadd = False
+    for j in range(len(lines[0])):
+        if lines[i][j].isdigit():
+            cur_num.append(int(lines[i][j]))
+            if grid[i][j] == 1:
+                toadd = True
+        else:
+            if cur_num and toadd:
+                num = arrToNum(cur_num)
+                res += num
+            cur_num = []
+            toadd = False
 print(res)
 
 # Part 2
