@@ -57,6 +57,8 @@ lines = list(zip(strings, checks))
 
 # Part 2
 
+# Credit to HyperNeutrino implementation
+
 def getLines():
     with open("input.txt", "r") as f:
         lines = [line.rstrip("\n") for line in f]
