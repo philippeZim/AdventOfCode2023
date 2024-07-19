@@ -40,4 +40,5 @@ num_of_lines = abs(temp[2]) + 1 + temp[3]
 
 grid = [["."] * line_len for _ in range(num_of_lines)]
 
+
 def mark_path()
