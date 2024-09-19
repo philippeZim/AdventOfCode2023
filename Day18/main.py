@@ -1,44 +1,57 @@
-with open("in.txt", "r") as f:
-    lines = [l.rstrip()[:l.find("(") - 1] for l in f]
+with open("in.txt", "r", encoding="utf-8") as f:
+    lines = [l.rstrip() for l in f]
+
+# Part 1
+
+inp = []
+for x in lines:
+    d = x.split()[0]
+    n = int(x.split()[1])
+    inp.append((d, n))
 
 
-def find_max_dir(l):
-    cur = [0, 0]
-    max_left = 0
-    max_right = 0
-    max_down = 0
-    max_up = 0
+def calc_area(inp_l):
+    map_dir = {
+        "U": (-1, 0),
+        "R": (0, 1),
+        "D": (1, 0),
+        "L": (0, -1)
+    }
 
-    for x in l:
-        n = int(x.split()[1])
-        if x[0] == "L":
-            cur[0] -= n
-        elif x[0] == "R":
-            cur[0] += n
-        elif x[0] == "U":
-            cur[1] += n
-        elif x[0] == "D":
-            cur[1] -= n
-        else:
-            print("Wrong Format")
-            exit(1)
+    position = (0, 0)
 
-        max_left = min(cur[0], max_left)
-        max_right = max(cur[0], max_right)
-        max_down = min(cur[1], max_down)
-        max_up = max(cur[1], max_up)
+    # Dieser Teil nutzt die Gauß'sche Flächenformel und anschließend Pigs theorem
 
-    return max_left, max_right, max_down, max_up
+    res = 0
+    b = 0
+    for x in inp_l:
+        b += x[1]
+        last = position
+        position = (position[0] + (map_dir[x[0]][0] * x[1]), position[1] + (map_dir[x[0]][1] * x[1]))
+        res += last[1] * position[0] - last[0] * position[1]
 
+    res /= 2
+    res = int(res)
+    i = res - (b / 2) + 1
+    res = int(i + b)
 
-temp = find_max_dir(lines)
-
-start_pos = (abs(temp[0]), temp[3])
-
-line_len = abs(temp[0]) + 1 + temp[1]
-num_of_lines = abs(temp[2]) + 1 + temp[3]
-
-grid = [["."] * line_len for _ in range(num_of_lines)]
+    print(res)
 
 
-def mark_path()
+calc_area(inp)
+
+# Part 2
+
+map2_dir = {
+    "0": "R",
+    "1": "D",
+    "2": "L",
+    "3": "U"
+}
+inp2 = []
+for x in lines:
+    n = int(x.split()[2][2:-2], 16)
+    d = map2_dir[x.split()[2][-2:-1]]
+    inp2.append((d, n))
+
+calc_area(inp2)
